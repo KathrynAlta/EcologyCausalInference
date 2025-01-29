@@ -26,6 +26,8 @@ For more recap and a live guide through ggdag and dagitty, I highly recommend th
 
 ```{r cars, echo= TRUE, warning = FALSE}
 ## Load Packages
+install.packages("tidygraph")
+install.packages("ggdag")
 library(ggdag)
 require(knitr)
 library(dagitty)
