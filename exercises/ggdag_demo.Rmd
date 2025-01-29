@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Learning Objectives
 * Understand what a DAG is and what it is useful for.
+
 * Understand how to construct a DAG in R to represent a set of assumptions about causal
 relationships.
 * Understand how to use a DAG to determine the consequences of including
