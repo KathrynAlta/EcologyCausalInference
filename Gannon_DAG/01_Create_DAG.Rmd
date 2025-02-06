@@ -26,34 +26,38 @@ library(tidyverse)
 <span style="color:purple;">
 [*Katie Comment:* I study lakes and for one of my projects I am interested in the processes happening under lake ice in winter. I will be using this exercise to explore how the amount of organic matter (measured as the concentration of dissolved organic carbon or DOC) in the water of a lake in the fall impacts the duration of anoxia (no oxygen) in bottom waters of mountain lakes.  
 
+Here are all of the variables that I initially included in my DAG
 
  **Variable name   **   | **Description    **                                                                         | 
 ----------------------- | ------------------------------------------------------------------------------------------- 
 | $\text{anox_duration}$    |  The amount of time (measured in days) that the water at the bottom of the lake has an oxygen concentration under 0.5 mg/L |
 $\text{O2_at_Freeze}$          | The total amount of oxygen present in the lake when the lake freezes in the fall |
 $\text{Ice_Duration}$ | Amount of time (measured in days) that ice is on the lake in the winter |
-$\text{Native_yr0}$ | Native plant species richness in year 0 per plot |
-$\text{NPKTreatment}$  |  Randomized experimental treatment: nutrient addition |
-$\text{Ndep_sy}$  | Nitrogen deposition for a site and year |
-$\text{Climate_sy}$  | Climate conditions for a site and year  |
-$\text{SoilFert_yr0}$  |  Soil feritility for each plot in the pre-treatment year |
-$\text{livestock_sy}$  | livestock grazing by site and year|
-$\text{Dist_to_Road_s}$  | Distance to road for each site |
-$\text{Oldfield_past_s }$  | |
-$\text{pastlivestock_yr0}$  | Past grazing for each site (pre-treatment) |
+$\text{Rare of O2 Drawdown}$ | NThe rate of oxygen depletion under ice |
+$\text{Lake Volume}$  |  Volume of water in the lake  |
+$\text{Fall Mixing Duration}$  | Nitrogen deposition for a site and year |
+$\text{Freezing Degree Days }$  | Climate conditions for a site and year  |
+$\text{Snow Accumulation}$  |  Soil feritility for each plot in the pre-treatment year |
+$\text{Ice Thickness}$  | livestock grazing by site and year|
+$\text{SWE}$  | Distance to road for each site |
+$\text{Wind}$  | average windspeed at on the lake since last snowfall event |
+$\text{ER Under Ice}$  | Past grazing for each site (pre-treatment) |
+$\text{GPP Under Ice}$  | Past grazing for each site (pre-treatment) |
+$\text{Summer GPP}$  | Past grazing for each site (pre-treatment) |
+$\text{Terrestrial DOC Inputs}$  | Past grazing for each site (pre-treatment) |
+$\text{DOC at freezing}$  | Past grazing for each site (pre-treatment) |
+
+After going through this exercise I realize that I can certainly simplify some of these! 
 ]
 </span>
 
-
-
-# Simple DAG 
+# First Draft DAG 
 
 ```{r}
-## Specify the DAG
-DAG_oxygen_under_ice <- dagify(
+## Specify the DAG - Version 1
+DAG_oxygen_under_ice_v1 <- dagify(
   anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
   O2_at_Freeze ~ Lake_Volume + Fall_Mixing_Duration,
-  Fall_Mixing_Duration ~ Fall_Temp,
   Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation + Ice_Thickness, 
   Snow_Accumulation ~ SWE + Wind,
   Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
@@ -64,53 +68,111 @@ DAG_oxygen_under_ice <- dagify(
 )
 plot(DAG_oxygen_under_ice)
 ```
-
-Identify which variable is the outcome of interest 
-Here I set the seed when plotting because otherwise the DAG shows up in different orientations each time! 
-
+# DAG Version 2
 ```{r}
-DAG_oxygen_under_ice_effects <- dagify(
+set.seed(061295)
+## Specify the DAG - Version 2
+DAG_oxygen_under_ice_v2 <- dagify(
   anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-  O2_at_Freeze ~ Lake_Volume + Fall_Mixing_Duration + Summer_GPP,
-  Fall_Mixing_Duration ~ Fall_Temp,
-  Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation + Ice_Thickness, 
-  Snow_Accumulation ~ SWE + Wind,
   Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
   ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
   DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
   GPP_under_ice ~ Summer_GPP + Light_Availability,
-  Light_Availability ~ Snow_Accumulation + Ice_Thickness, 
-  
-  exposure = "DOC_at_Freeze", #wont run if current biodiersity  also effects current exotic because then the graph is not acyclic
-  outcome = "anox_duration",
-  labels = c(outcome = "Annoxic Duration",
-             exposure = "DOC at Lake Freeze "))
+  Light_Availability ~ Snow_Accumulation + Ice_Thickness,
+  Ice_Thickness ~ Freezing_Degree_Days,
+  Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
+  O2_at_Freeze ~ Summer_GPP,
+  Summer_GPP~ Terrestrial_DOC_Inputs
+)
+plot(DAG_oxygen_under_ice_v2)
+```
 
 
+
+
+Identify which variable is the outcome of interest 
+(set the seed when plotting because otherwise the DAG shows up in different orientations each time!) 
+
+```{r}
+
+# Version 1 with Labels 
+    DAG_oxygen_under_ice_v1 <- dagify(
+      
+      #Identify Relatiobships 
+      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
+      O2_at_Freeze ~ Lake_Volume + Fall_Mixing_Duration,
+      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation + Ice_Thickness, 
+      Snow_Accumulation ~ SWE + Wind,
+      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
+      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
+      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
+      GPP_under_ice ~ Summer_GPP + Light_Availability,
+      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
+    
+      # Specify exposure and outcome 
+      exposure = "DOC_at_Freeze", 
+      outcome = "anox_duration",
+      
+      # Label 
+      labels = c(outcome = "Annoxic Duration",
+                 exposure = "DOC at Lake Freeze "))
+
+
+# Version 2 with labels 
+
+    DAG_oxygen_under_ice_v2 <- dagify(
+      
+      #Identify Relatiobships 
+      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
+      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
+      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
+      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
+      GPP_under_ice ~ Summer_GPP + Light_Availability,
+      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
+      Ice_Thickness ~ Freezing_Degree_Days,
+      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
+      O2_at_Freeze ~ Summer_GPP,
+      Summer_GPP~ Terrestrial_DOC_Inputs,
+    
+      # Specify exposure and outcome 
+      exposure = "DOC_at_Freeze", 
+      outcome = "anox_duration",
+      
+      # Label 
+      labels = c(outcome = "Annoxic Duration",
+                 exposure = "DOC at Lake Freeze "))
+
+# Visualize both versions 
 set.seed(124)
-ggdag(DAG_oxygen_under_ice_effects, 
-       use_labels = "label")
 
-ggdag_status(DAG_oxygen_under_ice_effects,
+ggdag_status(DAG_oxygen_under_ice_v1,
              use_labels = "label",
              text = TRUE,
+             text_col = "black",
+             label_alpha = 0.5) + theme_dag()
+
+
+ggdag_status(DAG_oxygen_under_ice_v2,
+             use_labels = "label",
+             text = TRUE,
+              text_col = "black",
              label_alpha = 0.5) + theme_dag()
 ```
 <span style="color:purple;">
 [*Katie Comment:* Cool! I have a DAG! It is a bit of a mess at the momment because I think there are some extra variables that I don't need to worry about still hanging around in the DAG. As we move forward and refine things I might be able to make this prettier!  ]
 </span>
 
-To identify  what must be controlled for, we can use adjustmentSets(). We can also have a summary of all possible paths in the DAG and identify which are open vs closed backdoors using paths(). 
+Identify what must be controled for using adjustmentSets(). We can also have a summary of all possible paths in the DAG and identify which are open vs closed backdoors using paths(). 
 
 This function takes a DAG, with a given “exposure” or "treatment variable" and an “outcome” and identifies open backdoors: confounding variables (common causes) that need to be controlled for. 
 
 ```{r, echo = TRUE}
 #identify the open paths that need to be adjusted for 
-paths(DAG_oxygen_under_ice_effects)
+paths(DAG_oxygen_under_ice_v2)
 
 #plot the open  paths 
-ggdag_paths(DAG_oxygen_under_ice_effects)
-ggdag_paths(DAG_oxygen_under_ice_effects, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
+ggdag_paths(DAG_oxygen_under_ice_v2)
+ggdag_paths(DAG_oxygen_under_ice_v2, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
 ```
 <span style="color:purple;">
 [*Katie Comment:* Here I have two open paths: 
@@ -127,30 +189,34 @@ Looking at paths [7] and [16] I have a slightly confusing structure where summer
 
 ```{r, echo = TRUE}
 #you can identify "descendant nodes" 
-ggdag_descendants(DAG_oxygen_under_ice_effects, "Summer_GPP")
+ggdag_descendants(DAG_oxygen_under_ice_v2, "Summer_GPP")
 ```
 
 ```{r, echo = TRUE}
 #identify the covariaters need to be adjusted for to meet the back-door criterion
-adjustmentSets(DAG_oxygen_under_ice_effects)
+adjustmentSets(DAG_oxygen_under_ice_v2)
 
 # Finally, you can also visulaize the variables that need to be adjusted for (which is also told to you by the adjustmentSets() function 
-ggdag_adjustment_set(DAG_oxygen_under_ice_effects, shadow = TRUE) 
+ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE) 
 #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included.
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl) ]
+[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl) 
+]
 </span>
 
 
 We can also check to see which variables are conditionally independences in the DAG using impliedConditionalIndependencies().
 ```{r, echo = TRUE}
-impliedConditionalIndependencies(DAG_oxygen_under_ice_effects)
+impliedConditionalIndependencies(DAG_oxygen_under_ice_v2)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Well that is a terrifyingly long list of conditional indipendicies. I think that I might need to more explicitly time step some of my variables. For example GPP and ER do impact eachother in each direction. So I need to specify GPP of the previous summer impacting ER under ice in winter etc.  ]
+[*Katie Comment:* Well that is a terrifyingly long list of conditional indipendicies. I think that I might need to more explicitly time step some of my variables. For example GPP and ER do impact eachother in each direction. So I need to specify GPP of the previous summer impacting ER under ice in winter etc.
+
+*Questions:* Including lake and year as random effects?  
+]
 </span>
 
 
