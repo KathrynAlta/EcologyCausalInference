@@ -35,17 +35,17 @@ $\text{O2_at_Freeze}$          | The total amount of oxygen present in the lake 
 $\text{Ice_Duration}$ | Amount of time (measured in days) that ice is on the lake in the winter |
 $\text{Rare of O2 Drawdown}$ | NThe rate of oxygen depletion under ice |
 $\text{Lake Volume}$  |  Volume of water in the lake  |
-$\text{Fall Mixing Duration}$  | Nitrogen deposition for a site and year |
-$\text{Freezing Degree Days }$  | Climate conditions for a site and year  |
-$\text{Snow Accumulation}$  |  Soil feritility for each plot in the pre-treatment year |
-$\text{Ice Thickness}$  | livestock grazing by site and year|
-$\text{SWE}$  | Distance to road for each site |
+$\text{Fall Mixing Duration}$  | Number of days that the lake was fully mixed in fall |
+$\text{Freezing Degree Days }$  | Number of days when the air temperature was bellow freezing  |
+$\text{Snow Accumulation}$  |  Snow depth on the lake |
+$\text{Ice Thickness}$  | Thickness of ice measured in cm|
+$\text{SWE}$  | Snow water equivalents |
 $\text{Wind}$  | average windspeed at on the lake since last snowfall event |
-$\text{ER Under Ice}$  | Past grazing for each site (pre-treatment) |
-$\text{GPP Under Ice}$  | Past grazing for each site (pre-treatment) |
-$\text{Summer GPP}$  | Past grazing for each site (pre-treatment) |
-$\text{Terrestrial DOC Inputs}$  | Past grazing for each site (pre-treatment) |
-$\text{DOC at freezing}$  | Past grazing for each site (pre-treatment) |
+$\text{ER Under Ice}$  | Rate of ecosystem respiration occuring under ice  |
+$\text{GPP Under Ice}$  | Rate of gross primary productivity under ice |
+$\text{Summer GPP}$  | Rate of gross primary productivity the previous summer |
+$\text{Terrestrial DOC Inputs}$  | Organic matter inputs to the lake from the watershed during summer |
+$\text{DOC at freezing}$  | Amount of organic matter present in the lake when the ice freezes measured as concentration of dissolved organic matter |
 
 After going through this exercise I realize that I can certainly simplify some of these! 
 ]
@@ -141,6 +141,30 @@ Identify which variable is the outcome of interest
       # Label 
       labels = c(outcome = "Annoxic Duration",
                  exposure = "DOC at Lake Freeze "))
+    
+# Version 3 with labels (Same DAG but slightly different question)
+
+    DAG_oxygen_under_ice_v3 <- dagify(
+      
+      #Identify Relatiobships 
+      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
+      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
+      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
+      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
+      GPP_under_ice ~ Summer_GPP + Light_Availability,
+      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
+      Ice_Thickness ~ Freezing_Degree_Days,
+      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
+      O2_at_Freeze ~ Summer_GPP,
+      Summer_GPP~ Terrestrial_DOC_Inputs,
+    
+      # Specify exposure and outcome 
+      exposure = "Summer_GPP", 
+      outcome = "anox_duration",
+      
+      # Label 
+      labels = c(outcome = "Annoxic Duration",
+                 exposure = "Summer GPP"))
 
 # Visualize both versions 
 set.seed(124)
@@ -153,6 +177,12 @@ ggdag_status(DAG_oxygen_under_ice_v1,
 
 
 ggdag_status(DAG_oxygen_under_ice_v2,
+             use_labels = "label",
+             text = TRUE,
+              text_col = "black",
+             label_alpha = 0.5) + theme_dag()
+
+ggdag_status(DAG_oxygen_under_ice_v3,
              use_labels = "label",
              text = TRUE,
               text_col = "black",
@@ -173,6 +203,13 @@ paths(DAG_oxygen_under_ice_v2)
 #plot the open  paths 
 ggdag_paths(DAG_oxygen_under_ice_v2)
 ggdag_paths(DAG_oxygen_under_ice_v2, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
+
+#identify the open paths that need to be adjusted for 
+paths(DAG_oxygen_under_ice_v3)
+
+#plot the open  paths 
+ggdag_paths(DAG_oxygen_under_ice_v3)
+ggdag_paths(DAG_oxygen_under_ice_v3, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
 ```
 <span style="color:purple;">
 [*Katie Comment:* Here I have two open paths: 
@@ -195,6 +232,7 @@ ggdag_descendants(DAG_oxygen_under_ice_v2, "Summer_GPP")
 ```{r, echo = TRUE}
 #identify the covariaters need to be adjusted for to meet the back-door criterion
 adjustmentSets(DAG_oxygen_under_ice_v2)
+adjustmentSets(DAG_oxygen_under_ice_v3)
 
 # Finally, you can also visulaize the variables that need to be adjusted for (which is also told to you by the adjustmentSets() function 
 ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE) 
@@ -202,7 +240,7 @@ ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl) 
+[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl). Really interesting fiddling with the question I am asking ("What if the causal question is "how does summer GPP impact anoxic duration?") and in that case it completely changes the adjustments you need and there is only one option! In that case we would need to condition on summer terrestrial DOC inputs  
 ]
 </span>
 
