@@ -1,20 +1,20 @@
 ---
-title: "Constructing a DAG for Anoxic Duration Under Ice and the Concentration of Dissolved Organic Matter in Fall"
+title: Constructing a DAG for Anoxic Duration Under Ice and the Concentration of Dissolved
+  Organic Matter in Fall
 author: "Katie Gannon"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Using dagitty and ggdag in R 
+# Setting Up R Environment
 
 ```{r cars, echo= TRUE, warning = FALSE}
-## Load Packages
-# install.packages("tidygraph")
-# install.packages("ggdag")
 library(ggdag)
 require(knitr)
 library(dagitty)
@@ -23,10 +23,14 @@ require(ddplyr)
 library(tidyverse)
 ```
 
+# Project Overview
 <span style="color:purple;">
-[*Katie Comment:* I study lakes and for one of my projects I am interested in the processes happening under lake ice in winter. I will be using this exercise to explore how the amount of organic matter (measured as the concentration of dissolved organic carbon or DOC) in the water of a lake in the fall impacts the duration of anoxia (no oxygen) in bottom waters of mountain lakes.  
+*Katie Comment:* I study lakes and for one of my projects I am interested in the processes happening under lake ice in winter. I will be using this exercise to explore how the amount of organic matter (measured as the concentration of dissolved organic carbon or DOC) in the water of a lake in the fall impacts the duration of anoxia (no oxygen) in bottom waters of mountain lakes. 
+</span> 
 
-Here are all of the variables that I initially included in my DAG
+<span style="color:purple;">
+Here are all of the variables that I initially included in my DAG After going through this exercise I realize that I can certainly simplify some of these! 
+</span>
 
  **Variable name   **   | **Description    **                                                                         | 
 ----------------------- | ------------------------------------------------------------------------------------------- 
@@ -47,9 +51,6 @@ $\text{Summer GPP}$  | Rate of gross primary productivity the previous summer |
 $\text{Terrestrial DOC Inputs}$  | Organic matter inputs to the lake from the watershed during summer |
 $\text{DOC at freezing}$  | Amount of organic matter present in the lake when the ice freezes measured as concentration of dissolved organic matter |
 
-After going through this exercise I realize that I can certainly simplify some of these! 
-]
-</span>
 
 # First Draft DAG 
 
@@ -66,7 +67,7 @@ DAG_oxygen_under_ice_v1 <- dagify(
   GPP_under_ice ~ Summer_GPP + Light_Availability,
   Light_Availability ~ Snow_Accumulation + Ice_Thickness
 )
-plot(DAG_oxygen_under_ice)
+plot(DAG_oxygen_under_ice_v1)
 ```
 # DAG Version 2
 ```{r}
@@ -89,8 +90,7 @@ plot(DAG_oxygen_under_ice_v2)
 
 
 
-
-Identify which variable is the outcome of interest 
+# Identifying Variables of Interest
 (set the seed when plotting because otherwise the DAG shows up in different orientations each time!) 
 
 ```{r}
@@ -188,12 +188,13 @@ ggdag_status(DAG_oxygen_under_ice_v3,
               text_col = "black",
              label_alpha = 0.5) + theme_dag()
 ```
+
 <span style="color:purple;">
-[*Katie Comment:* Cool! I have a DAG! It is a bit of a mess at the momment because I think there are some extra variables that I don't need to worry about still hanging around in the DAG. As we move forward and refine things I might be able to make this prettier!  ]
+*Katie Comment:* Cool! I have a DAG! It is a bit of a mess at the momment because I think there are some extra variables that I don't need to worry about still hanging around in the DAG. As we move forward and refine things I might be able to make this prettier!  
 </span>
 
-Identify what must be controled for using adjustmentSets(). We can also have a summary of all possible paths in the DAG and identify which are open vs closed backdoors using paths(). 
-
+#Identify what must be controled for using adjustmentSets(). 
+We can also have a summary of all possible paths in the DAG and identify which are open vs closed backdoors using paths(). 
 This function takes a DAG, with a given “exposure” or "treatment variable" and an “outcome” and identifies open backdoors: confounding variables (common causes) that need to be controlled for. 
 
 ```{r, echo = TRUE}
@@ -212,23 +213,21 @@ ggdag_paths(DAG_oxygen_under_ice_v3)
 ggdag_paths(DAG_oxygen_under_ice_v3, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
 ```
 <span style="color:purple;">
-[*Katie Comment:* Here I have two open paths: 
+[*Katie Comment:* Here I have two open paths: Both of these paths are open and there are mediators along my causal path of interest from DOC at freeze to anoxic duration. For path [1] we do not want to condition on either ER under Ice or Rate of O2 draw down because they are mediating variables. Looking at paths [7] and [16] I have a slightly confusing structure where summer GPP impacts, DOC at freeze, O2 at freeze, and GPP under ice. In this case I am not sure if I need to condition on summer GPP? ]
+</span>
+
 [1] "DOC_at_Freeze -> ER_under_ice -> Rate_O2_Drawdown -> anox_duration"
 [7] "DOC_at_Freeze <- Summer_GPP -> GPP_under_ice -> Rate_O2_Drawdown -> anox_duration"
 [16] "DOC_at_Freeze <- Summer_GPP -> O2_at_Freeze -> anox_duration"
 
-Both of these paths are open and there are mediators along my causal path of interest from DOC at freeze to anoxic duration 
-For path [1] we do not want to condition on either ER under Ice or Rate of O2 draw down because they are mediating variables. 
-Looking at paths [7] and [16] I have a slightly confusing structure where summer GPP impacts, DOC at freeze, O2 at freeze, and GPP under ice. In this case I am not sure if I need to condition on summer GPP? ]
-</span>
-
  
-
+# Identify Decendent Nodes 
 ```{r, echo = TRUE}
 #you can identify "descendant nodes" 
 ggdag_descendants(DAG_oxygen_under_ice_v2, "Summer_GPP")
 ```
 
+# Identify and Visualize Covariates that need to be adjusted for 
 ```{r, echo = TRUE}
 #identify the covariaters need to be adjusted for to meet the back-door criterion
 adjustmentSets(DAG_oxygen_under_ice_v2)
@@ -240,22 +239,23 @@ ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl). Really interesting fiddling with the question I am asking ("What if the causal question is "how does summer GPP impact anoxic duration?") and in that case it completely changes the adjustments you need and there is only one option! In that case we would need to condition on summer terrestrial DOC inputs  
-]
+[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl). Really interesting fiddling with the question I am asking ("What if the causal question is "how does summer GPP impact anoxic duration?") and in that case it completely changes the adjustments you need and there is only one option! In that case we would need to condition on summer terrestrial DOC inputs ]
 </span>
 
-
+#Check Conditional independeces
 We can also check to see which variables are conditionally independences in the DAG using impliedConditionalIndependencies().
 ```{r, echo = TRUE}
+# Identify the implied conditional dependencies
 impliedConditionalIndependencies(DAG_oxygen_under_ice_v2)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Well that is a terrifyingly long list of conditional indipendicies. I think that I might need to more explicitly time step some of my variables. For example GPP and ER do impact eachother in each direction. So I need to specify GPP of the previous summer impacting ER under ice in winter etc.
-
-*Questions:* Including lake and year as random effects?  
-]
+[*Katie Comment:* Well that is a terrifyingly long list of conditional indipendicies. I think that I might need to more explicitly time step some of my variables. For example GPP and ER do impact eachother in each direction. So I need to specify GPP of the previous summer impacting ER under ice in winter etc.]
 </span>
+
+<span style="color:purple;">
+[*Questions:* Including lake and year as random effects?]</span>
+
 
 
 
