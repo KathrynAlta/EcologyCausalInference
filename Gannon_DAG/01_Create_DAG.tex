@@ -1,39 +1,41 @@
-\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 %
-\documentclass[]{article}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provides euro and other symbols
-\else % if luatex or xelatex
-  \usepackage{unicode-math}
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
-% use upquote if available, for straight quotes in verbatim environments
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage[]{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
-\IfFileExists{parskip.sty}{%
-\usepackage{parskip}
-}{% else
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-}
-\usepackage{hyperref}
-\hypersetup{
-            pdftitle={Constructing a DAG for Anoxic Duration Under Ice and the Concentration of Dissolved Organic Matter in Fall},
-            pdfauthor={Katie Gannon},
-            pdfborder={0 0 0},
-            breaklinks=true}
-\urlstyle{same}  % don't use monospace font for urls
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
 \usepackage{color}
 \usepackage{fancyvrb}
@@ -46,13 +48,13 @@
 \newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
 \newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
 \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
 \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
 \newcommand{\BuiltInTok}[1]{#1}
 \newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
 \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
 \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
 \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
 \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
@@ -60,7 +62,7 @@
 \newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
 \newcommand{\ExtensionTok}[1]{#1}
 \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
 \newcommand{\ImportTok}[1]{#1}
 \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
@@ -69,16 +71,23 @@
 \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
 \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
 \newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
 \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\usepackage{longtable,booktabs}
-% Fix footnotes in tables (requires footnote package)
-\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
-\usepackage{graphicx,grffile}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -87,40 +96,39 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-\setlength{\emergencystretch}{3em}  % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{0}
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
-
-% set default figure placement to htbp
+% Set default figure placement to htbp
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Constructing a DAG for Anoxic Duration Under Ice and the Concentration of Dissolved Organic Matter in Fall},
+  pdfauthor={Katie Gannon},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-
-\title{Constructing a DAG for Anoxic Duration Under Ice and the Concentration
-of Dissolved Organic Matter in Fall}
+\title{Constructing a DAG for Anoxic Duration Under Ice and the
+Concentration of Dissolved Organic Matter in Fall}
 \author{Katie Gannon}
-\date{2025-02-05}
+\date{2025-02-06}
 
 \begin{document}
 \maketitle
 
-\hypertarget{setting-up-r-environment}{%
-\section{Setting Up R Environment}\label{setting-up-r-environment}}
+\section{Setting Up R Environment}\label{setting-up-r-environment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(ggdag)}
+\FunctionTok{library}\NormalTok{(ggdag)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -137,7 +145,7 @@ of Dissolved Organic Matter in Fall}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{require}\NormalTok{(knitr)}
+\FunctionTok{require}\NormalTok{(knitr)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -147,8 +155,8 @@ of Dissolved Organic Matter in Fall}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(dagitty)}
-\KeywordTok{require}\NormalTok{(tidyr)}
+\FunctionTok{library}\NormalTok{(dagitty)}
+\FunctionTok{require}\NormalTok{(tidyr)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -158,7 +166,7 @@ of Dissolved Organic Matter in Fall}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{require}\NormalTok{(ddplyr)}
+\FunctionTok{require}\NormalTok{(ddplyr)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -168,14 +176,14 @@ of Dissolved Organic Matter in Fall}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
 ## v dplyr     1.1.4     v purrr     1.0.2
-## v forcats   1.0.0     v readr     2.1.4
+## v forcats   1.0.0     v readr     2.1.5
 ## v ggplot2   3.5.1     v stringr   1.5.1
 ## v lubridate 1.9.3     v tibble    3.2.1
 \end{verbatim}
@@ -187,8 +195,7 @@ of Dissolved Organic Matter in Fall}
 ## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 \end{verbatim}
 
-\hypertarget{project-overview}{%
-\section{Project Overview}\label{project-overview}}
+\section{Project Overview}\label{project-overview}
 
 { \emph{Katie Comment:} I study lakes and for one of my projects I am
 interested in the processes happening under lake ice in winter. I will
@@ -201,120 +208,68 @@ oxygen) in bottom waters of mountain lakes. }
 After going through this exercise I realize that I can certainly
 simplify some of these! }
 
-\begin{longtable}[]{@{}ll@{}}
-\toprule
-\begin{minipage}[b]{0.19\columnwidth}\raggedright
-\textbf{Variable name }\strut
-\end{minipage} & \begin{minipage}[b]{0.75\columnwidth}\raggedright
-\textbf{Description }\strut
-\end{minipage}\tabularnewline
-\midrule
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2018}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7982}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable name }
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Description }
+\end{minipage} \\
+\midrule\noalign{}
 \endhead
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{anox_duration}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-The amount of time (measured in days) that the water at the bottom of
-the lake has an oxygen concentration under 0.5 mg/L\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{O2_at_Freeze}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-The total amount of oxygen present in the lake when the lake freezes in
-the fall\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Ice_Duration}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Amount of time (measured in days) that ice is on the lake in the
-winter\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Rare of O2 Drawdown}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-NThe rate of oxygen depletion under ice\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Lake Volume}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Volume of water in the lake\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Fall Mixing Duration}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Number of days that the lake was fully mixed in fall\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Freezing Degree Days }\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Number of days when the air temperature was bellow freezing\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Snow Accumulation}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Snow depth on the lake\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Ice Thickness}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Thickness of ice measured in cm\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{SWE}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Snow water equivalents\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Wind}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-average windspeed at on the lake since last snowfall event\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{ER Under Ice}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Rate of ecosystem respiration occuring under ice\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{GPP Under Ice}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Rate of gross primary productivity under ice\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Summer GPP}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Rate of gross primary productivity the previous summer\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{Terrestrial DOC Inputs}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Organic matter inputs to the lake from the watershed during summer\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.19\columnwidth}\raggedright
-\(\text{DOC at freezing}\)\strut
-\end{minipage} & \begin{minipage}[t]{0.75\columnwidth}\raggedright
-Amount of organic matter present in the lake when the ice freezes
-measured as concentration of dissolved organic matter\strut
-\end{minipage}\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+\(\text{anox_duration}\) & The amount of time (measured in days) that
+the water at the bottom of the lake has an oxygen concentration under
+0.5 mg/L \\
+\(\text{O2_at_Freeze}\) & The total amount of oxygen present in the lake
+when the lake freezes in the fall \\
+\(\text{Ice_Duration}\) & Amount of time (measured in days) that ice is
+on the lake in the winter \\
+\(\text{Rare of O2 Drawdown}\) & NThe rate of oxygen depletion under
+ice \\
+\(\text{Lake Volume}\) & Volume of water in the lake \\
+\(\text{Fall Mixing Duration}\) & Number of days that the lake was fully
+mixed in fall \\
+\(\text{Freezing Degree Days }\) & Number of days when the air
+temperature was bellow freezing \\
+\(\text{Snow Accumulation}\) & Snow depth on the lake \\
+\(\text{Ice Thickness}\) & Thickness of ice measured in cm \\
+\(\text{SWE}\) & Snow water equivalents \\
+\(\text{Wind}\) & average windspeed at on the lake since last snowfall
+event \\
+\(\text{ER Under Ice}\) & Rate of ecosystem respiration occuring under
+ice \\
+\(\text{GPP Under Ice}\) & Rate of gross primary productivity under
+ice \\
+\(\text{Summer GPP}\) & Rate of gross primary productivity the previous
+summer \\
+\(\text{Terrestrial DOC Inputs}\) & Organic matter inputs to the lake
+from the watershed during summer \\
+\(\text{DOC at freezing}\) & Amount of organic matter present in the
+lake when the ice freezes measured as concentration of dissolved organic
+matter \\
 \end{longtable}
 
-\hypertarget{first-draft-dag}{%
-\section{First Draft DAG}\label{first-draft-dag}}
+\section{First Draft DAG}\label{first-draft-dag}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{## Specify the DAG - Version 1}
-\NormalTok{DAG_oxygen_under_ice_v1 <-}\StringTok{ }\KeywordTok{dagify}\NormalTok{(}
-\NormalTok{  anox_duration }\OperatorTok{~}\StringTok{ }\NormalTok{O2_at_Freeze }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Duration }\OperatorTok{+}\StringTok{ }\NormalTok{Rate_O2_Drawdown,}
-\NormalTok{  O2_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Lake_Volume }\OperatorTok{+}\StringTok{ }\NormalTok{Fall_Mixing_Duration,}
-\NormalTok{  Ice_Duration }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness, }
-\NormalTok{  Snow_Accumulation }\OperatorTok{~}\StringTok{ }\NormalTok{SWE }\OperatorTok{+}\StringTok{ }\NormalTok{Wind,}
-\NormalTok{  Rate_O2_Drawdown }\OperatorTok{~}\StringTok{ }\NormalTok{ER_under_ice }\OperatorTok{+}\StringTok{ }\NormalTok{GPP_under_ice, }
-\NormalTok{  ER_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{DOC_at_Freeze,}
-\NormalTok{  DOC_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs }\OperatorTok{+}\StringTok{ }\NormalTok{Summer_GPP, }
-\NormalTok{  GPP_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP }\OperatorTok{+}\StringTok{ }\NormalTok{Light_Availability,}
-\NormalTok{  Light_Availability }\OperatorTok{~}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness}
+\DocumentationTok{\#\# Specify the DAG {-} Version 1}
+\NormalTok{DAG\_oxygen\_under\_ice\_v1 }\OtherTok{\textless{}{-}} \FunctionTok{dagify}\NormalTok{(}
+\NormalTok{  anox\_duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ O2\_at\_Freeze }\SpecialCharTok{+}\NormalTok{ Ice\_Duration }\SpecialCharTok{+}\NormalTok{ Rate\_O2\_Drawdown,}
+\NormalTok{  O2\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Lake\_Volume }\SpecialCharTok{+}\NormalTok{ Fall\_Mixing\_Duration,}
+\NormalTok{  Ice\_Duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness, }
+\NormalTok{  Snow\_Accumulation }\SpecialCharTok{\textasciitilde{}}\NormalTok{ SWE }\SpecialCharTok{+}\NormalTok{ Wind,}
+\NormalTok{  Rate\_O2\_Drawdown }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ER\_under\_ice }\SpecialCharTok{+}\NormalTok{ GPP\_under\_ice, }
+\NormalTok{  ER\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ DOC\_at\_Freeze,}
+\NormalTok{  DOC\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs }\SpecialCharTok{+}\NormalTok{ Summer\_GPP, }
+\NormalTok{  GPP\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP }\SpecialCharTok{+}\NormalTok{ Light\_Availability,}
+\NormalTok{  Light\_Availability }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness}
 \NormalTok{)}
-\KeywordTok{plot}\NormalTok{(DAG_oxygen_under_ice_v1)}
+\FunctionTok{plot}\NormalTok{(DAG\_oxygen\_under\_ice\_v1)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -327,21 +282,21 @@ measured as concentration of dissolved organic matter\strut
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{061295}\NormalTok{)}
-\CommentTok{## Specify the DAG - Version 2}
-\NormalTok{DAG_oxygen_under_ice_v2 <-}\StringTok{ }\KeywordTok{dagify}\NormalTok{(}
-\NormalTok{  anox_duration }\OperatorTok{~}\StringTok{ }\NormalTok{O2_at_Freeze }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Duration }\OperatorTok{+}\StringTok{ }\NormalTok{Rate_O2_Drawdown,}
-\NormalTok{  Rate_O2_Drawdown }\OperatorTok{~}\StringTok{ }\NormalTok{ER_under_ice }\OperatorTok{+}\StringTok{ }\NormalTok{GPP_under_ice, }
-\NormalTok{  ER_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{DOC_at_Freeze,}
-\NormalTok{  DOC_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs }\OperatorTok{+}\StringTok{ }\NormalTok{Summer_GPP, }
-\NormalTok{  GPP_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP }\OperatorTok{+}\StringTok{ }\NormalTok{Light_Availability,}
-\NormalTok{  Light_Availability }\OperatorTok{~}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness,}
-\NormalTok{  Ice_Thickness }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days,}
-\NormalTok{  Ice_Duration }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{Snow_Accumulation, }
-\NormalTok{  O2_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP,}
-\NormalTok{  Summer_GPP}\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{061295}\NormalTok{)}
+\DocumentationTok{\#\# Specify the DAG {-} Version 2}
+\NormalTok{DAG\_oxygen\_under\_ice\_v2 }\OtherTok{\textless{}{-}} \FunctionTok{dagify}\NormalTok{(}
+\NormalTok{  anox\_duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ O2\_at\_Freeze }\SpecialCharTok{+}\NormalTok{ Ice\_Duration }\SpecialCharTok{+}\NormalTok{ Rate\_O2\_Drawdown,}
+\NormalTok{  Rate\_O2\_Drawdown }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ER\_under\_ice }\SpecialCharTok{+}\NormalTok{ GPP\_under\_ice, }
+\NormalTok{  ER\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ DOC\_at\_Freeze,}
+\NormalTok{  DOC\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs }\SpecialCharTok{+}\NormalTok{ Summer\_GPP, }
+\NormalTok{  GPP\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP }\SpecialCharTok{+}\NormalTok{ Light\_Availability,}
+\NormalTok{  Light\_Availability }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness,}
+\NormalTok{  Ice\_Thickness }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days,}
+\NormalTok{  Ice\_Duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ Snow\_Accumulation, }
+\NormalTok{  O2\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP,}
+\NormalTok{  Summer\_GPP}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs}
 \NormalTok{)}
-\KeywordTok{plot}\NormalTok{(DAG_oxygen_under_ice_v2)}
+\FunctionTok{plot}\NormalTok{(DAG\_oxygen\_under\_ice\_v2)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -351,94 +306,93 @@ measured as concentration of dissolved organic matter\strut
 
 \includegraphics{01_Create_DAG_files/figure-latex/unnamed-chunk-2-1.pdf}
 
-\hypertarget{identifying-variables-of-interest}{%
 \section{Identifying Variables of
-Interest}\label{identifying-variables-of-interest}}
+Interest}\label{identifying-variables-of-interest}
 
 (set the seed when plotting because otherwise the DAG shows up in
 different orientations each time!)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Version 1 with Labels }
-\NormalTok{    DAG_oxygen_under_ice_v1 <-}\StringTok{ }\KeywordTok{dagify}\NormalTok{(}
+\CommentTok{\# Version 1 with Labels }
+\NormalTok{    DAG\_oxygen\_under\_ice\_v1 }\OtherTok{\textless{}{-}} \FunctionTok{dagify}\NormalTok{(}
       
-      \CommentTok{#Identify Relatiobships }
-\NormalTok{      anox_duration }\OperatorTok{~}\StringTok{ }\NormalTok{O2_at_Freeze }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Duration }\OperatorTok{+}\StringTok{ }\NormalTok{Rate_O2_Drawdown,}
-\NormalTok{      O2_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Lake_Volume }\OperatorTok{+}\StringTok{ }\NormalTok{Fall_Mixing_Duration,}
-\NormalTok{      Ice_Duration }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness, }
-\NormalTok{      Snow_Accumulation }\OperatorTok{~}\StringTok{ }\NormalTok{SWE }\OperatorTok{+}\StringTok{ }\NormalTok{Wind,}
-\NormalTok{      Rate_O2_Drawdown }\OperatorTok{~}\StringTok{ }\NormalTok{ER_under_ice }\OperatorTok{+}\StringTok{ }\NormalTok{GPP_under_ice, }
-\NormalTok{      ER_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{DOC_at_Freeze,}
-\NormalTok{      DOC_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs }\OperatorTok{+}\StringTok{ }\NormalTok{Summer_GPP, }
-\NormalTok{      GPP_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP }\OperatorTok{+}\StringTok{ }\NormalTok{Light_Availability,}
-\NormalTok{      Light_Availability }\OperatorTok{~}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness,}
+      \CommentTok{\#Identify Relatiobships }
+\NormalTok{      anox\_duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ O2\_at\_Freeze }\SpecialCharTok{+}\NormalTok{ Ice\_Duration }\SpecialCharTok{+}\NormalTok{ Rate\_O2\_Drawdown,}
+\NormalTok{      O2\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Lake\_Volume }\SpecialCharTok{+}\NormalTok{ Fall\_Mixing\_Duration,}
+\NormalTok{      Ice\_Duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness, }
+\NormalTok{      Snow\_Accumulation }\SpecialCharTok{\textasciitilde{}}\NormalTok{ SWE }\SpecialCharTok{+}\NormalTok{ Wind,}
+\NormalTok{      Rate\_O2\_Drawdown }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ER\_under\_ice }\SpecialCharTok{+}\NormalTok{ GPP\_under\_ice, }
+\NormalTok{      ER\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ DOC\_at\_Freeze,}
+\NormalTok{      DOC\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs }\SpecialCharTok{+}\NormalTok{ Summer\_GPP, }
+\NormalTok{      GPP\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP }\SpecialCharTok{+}\NormalTok{ Light\_Availability,}
+\NormalTok{      Light\_Availability }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness,}
     
-      \CommentTok{# Specify exposure and outcome }
-      \DataTypeTok{exposure =} \StringTok{"DOC_at_Freeze"}\NormalTok{, }
-      \DataTypeTok{outcome =} \StringTok{"anox_duration"}\NormalTok{,}
+      \CommentTok{\# Specify exposure and outcome }
+      \AttributeTok{exposure =} \StringTok{"DOC\_at\_Freeze"}\NormalTok{, }
+      \AttributeTok{outcome =} \StringTok{"anox\_duration"}\NormalTok{,}
       
-      \CommentTok{# Label }
-      \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
-                 \DataTypeTok{exposure =} \StringTok{"DOC at Lake Freeze "}\NormalTok{))}
+      \CommentTok{\# Label }
+      \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\AttributeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
+                 \AttributeTok{exposure =} \StringTok{"DOC at Lake Freeze "}\NormalTok{))}
 
 
-\CommentTok{# Version 2 with labels }
+\CommentTok{\# Version 2 with labels }
 
-\NormalTok{    DAG_oxygen_under_ice_v2 <-}\StringTok{ }\KeywordTok{dagify}\NormalTok{(}
+\NormalTok{    DAG\_oxygen\_under\_ice\_v2 }\OtherTok{\textless{}{-}} \FunctionTok{dagify}\NormalTok{(}
       
-      \CommentTok{#Identify Relatiobships }
-\NormalTok{      anox_duration }\OperatorTok{~}\StringTok{ }\NormalTok{O2_at_Freeze }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Duration }\OperatorTok{+}\StringTok{ }\NormalTok{Rate_O2_Drawdown,}
-\NormalTok{      Rate_O2_Drawdown }\OperatorTok{~}\StringTok{ }\NormalTok{ER_under_ice }\OperatorTok{+}\StringTok{ }\NormalTok{GPP_under_ice, }
-\NormalTok{      ER_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{DOC_at_Freeze,}
-\NormalTok{      DOC_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs }\OperatorTok{+}\StringTok{ }\NormalTok{Summer_GPP, }
-\NormalTok{      GPP_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP }\OperatorTok{+}\StringTok{ }\NormalTok{Light_Availability,}
-\NormalTok{      Light_Availability }\OperatorTok{~}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness,}
-\NormalTok{      Ice_Thickness }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days,}
-\NormalTok{      Ice_Duration }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{Snow_Accumulation, }
-\NormalTok{      O2_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP,}
-\NormalTok{      Summer_GPP}\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs,}
+      \CommentTok{\#Identify Relatiobships }
+\NormalTok{      anox\_duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ O2\_at\_Freeze }\SpecialCharTok{+}\NormalTok{ Ice\_Duration }\SpecialCharTok{+}\NormalTok{ Rate\_O2\_Drawdown,}
+\NormalTok{      Rate\_O2\_Drawdown }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ER\_under\_ice }\SpecialCharTok{+}\NormalTok{ GPP\_under\_ice, }
+\NormalTok{      ER\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ DOC\_at\_Freeze,}
+\NormalTok{      DOC\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs }\SpecialCharTok{+}\NormalTok{ Summer\_GPP, }
+\NormalTok{      GPP\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP }\SpecialCharTok{+}\NormalTok{ Light\_Availability,}
+\NormalTok{      Light\_Availability }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness,}
+\NormalTok{      Ice\_Thickness }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days,}
+\NormalTok{      Ice\_Duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ Snow\_Accumulation, }
+\NormalTok{      O2\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP,}
+\NormalTok{      Summer\_GPP}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs,}
     
-      \CommentTok{# Specify exposure and outcome }
-      \DataTypeTok{exposure =} \StringTok{"DOC_at_Freeze"}\NormalTok{, }
-      \DataTypeTok{outcome =} \StringTok{"anox_duration"}\NormalTok{,}
+      \CommentTok{\# Specify exposure and outcome }
+      \AttributeTok{exposure =} \StringTok{"DOC\_at\_Freeze"}\NormalTok{, }
+      \AttributeTok{outcome =} \StringTok{"anox\_duration"}\NormalTok{,}
       
-      \CommentTok{# Label }
-      \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
-                 \DataTypeTok{exposure =} \StringTok{"DOC at Lake Freeze "}\NormalTok{))}
+      \CommentTok{\# Label }
+      \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\AttributeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
+                 \AttributeTok{exposure =} \StringTok{"DOC at Lake Freeze "}\NormalTok{))}
     
-\CommentTok{# Version 3 with labels (Same DAG but slightly different question)}
+\CommentTok{\# Version 3 with labels (Same DAG but slightly different question)}
 
-\NormalTok{    DAG_oxygen_under_ice_v3 <-}\StringTok{ }\KeywordTok{dagify}\NormalTok{(}
+\NormalTok{    DAG\_oxygen\_under\_ice\_v3 }\OtherTok{\textless{}{-}} \FunctionTok{dagify}\NormalTok{(}
       
-      \CommentTok{#Identify Relatiobships }
-\NormalTok{      anox_duration }\OperatorTok{~}\StringTok{ }\NormalTok{O2_at_Freeze }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Duration }\OperatorTok{+}\StringTok{ }\NormalTok{Rate_O2_Drawdown,}
-\NormalTok{      Rate_O2_Drawdown }\OperatorTok{~}\StringTok{ }\NormalTok{ER_under_ice }\OperatorTok{+}\StringTok{ }\NormalTok{GPP_under_ice, }
-\NormalTok{      ER_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{DOC_at_Freeze,}
-\NormalTok{      DOC_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs }\OperatorTok{+}\StringTok{ }\NormalTok{Summer_GPP, }
-\NormalTok{      GPP_under_ice }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP }\OperatorTok{+}\StringTok{ }\NormalTok{Light_Availability,}
-\NormalTok{      Light_Availability }\OperatorTok{~}\StringTok{ }\NormalTok{Snow_Accumulation }\OperatorTok{+}\StringTok{ }\NormalTok{Ice_Thickness,}
-\NormalTok{      Ice_Thickness }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days,}
-\NormalTok{      Ice_Duration }\OperatorTok{~}\StringTok{ }\NormalTok{Freezing_Degree_Days }\OperatorTok{+}\StringTok{ }\NormalTok{Snow_Accumulation, }
-\NormalTok{      O2_at_Freeze }\OperatorTok{~}\StringTok{ }\NormalTok{Summer_GPP,}
-\NormalTok{      Summer_GPP}\OperatorTok{~}\StringTok{ }\NormalTok{Terrestrial_DOC_Inputs,}
+      \CommentTok{\#Identify Relatiobships }
+\NormalTok{      anox\_duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ O2\_at\_Freeze }\SpecialCharTok{+}\NormalTok{ Ice\_Duration }\SpecialCharTok{+}\NormalTok{ Rate\_O2\_Drawdown,}
+\NormalTok{      Rate\_O2\_Drawdown }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ER\_under\_ice }\SpecialCharTok{+}\NormalTok{ GPP\_under\_ice, }
+\NormalTok{      ER\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ DOC\_at\_Freeze,}
+\NormalTok{      DOC\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs }\SpecialCharTok{+}\NormalTok{ Summer\_GPP, }
+\NormalTok{      GPP\_under\_ice }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP }\SpecialCharTok{+}\NormalTok{ Light\_Availability,}
+\NormalTok{      Light\_Availability }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Snow\_Accumulation }\SpecialCharTok{+}\NormalTok{ Ice\_Thickness,}
+\NormalTok{      Ice\_Thickness }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days,}
+\NormalTok{      Ice\_Duration }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Freezing\_Degree\_Days }\SpecialCharTok{+}\NormalTok{ Snow\_Accumulation, }
+\NormalTok{      O2\_at\_Freeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Summer\_GPP,}
+\NormalTok{      Summer\_GPP}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Terrestrial\_DOC\_Inputs,}
     
-      \CommentTok{# Specify exposure and outcome }
-      \DataTypeTok{exposure =} \StringTok{"Summer_GPP"}\NormalTok{, }
-      \DataTypeTok{outcome =} \StringTok{"anox_duration"}\NormalTok{,}
+      \CommentTok{\# Specify exposure and outcome }
+      \AttributeTok{exposure =} \StringTok{"Summer\_GPP"}\NormalTok{, }
+      \AttributeTok{outcome =} \StringTok{"anox\_duration"}\NormalTok{,}
       
-      \CommentTok{# Label }
-      \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
-                 \DataTypeTok{exposure =} \StringTok{"Summer GPP"}\NormalTok{))}
+      \CommentTok{\# Label }
+      \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\AttributeTok{outcome =} \StringTok{"Annoxic Duration"}\NormalTok{,}
+                 \AttributeTok{exposure =} \StringTok{"Summer GPP"}\NormalTok{))}
 
-\CommentTok{# Visualize both versions }
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{124}\NormalTok{)}
+\CommentTok{\# Visualize both versions }
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{124}\NormalTok{)}
 
-\KeywordTok{ggdag_status}\NormalTok{(DAG_oxygen_under_ice_v1,}
-             \DataTypeTok{use_labels =} \StringTok{"label"}\NormalTok{,}
-             \DataTypeTok{text =} \OtherTok{TRUE}\NormalTok{,}
-             \DataTypeTok{text_col =} \StringTok{"black"}\NormalTok{,}
-             \DataTypeTok{label_alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_dag}\NormalTok{()}
+\FunctionTok{ggdag\_status}\NormalTok{(DAG\_oxygen\_under\_ice\_v1,}
+             \AttributeTok{use\_labels =} \StringTok{"label"}\NormalTok{,}
+             \AttributeTok{text =} \ConstantTok{TRUE}\NormalTok{,}
+             \AttributeTok{text\_col =} \StringTok{"black"}\NormalTok{,}
+             \AttributeTok{label\_alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme\_dag}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -446,11 +400,11 @@ different orientations each time!)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggdag_status}\NormalTok{(DAG_oxygen_under_ice_v2,}
-             \DataTypeTok{use_labels =} \StringTok{"label"}\NormalTok{,}
-             \DataTypeTok{text =} \OtherTok{TRUE}\NormalTok{,}
-              \DataTypeTok{text_col =} \StringTok{"black"}\NormalTok{,}
-             \DataTypeTok{label_alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_dag}\NormalTok{()}
+\FunctionTok{ggdag\_status}\NormalTok{(DAG\_oxygen\_under\_ice\_v2,}
+             \AttributeTok{use\_labels =} \StringTok{"label"}\NormalTok{,}
+             \AttributeTok{text =} \ConstantTok{TRUE}\NormalTok{,}
+              \AttributeTok{text\_col =} \StringTok{"black"}\NormalTok{,}
+             \AttributeTok{label\_alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme\_dag}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -458,11 +412,11 @@ different orientations each time!)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggdag_status}\NormalTok{(DAG_oxygen_under_ice_v3,}
-             \DataTypeTok{use_labels =} \StringTok{"label"}\NormalTok{,}
-             \DataTypeTok{text =} \OtherTok{TRUE}\NormalTok{,}
-              \DataTypeTok{text_col =} \StringTok{"black"}\NormalTok{,}
-             \DataTypeTok{label_alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_dag}\NormalTok{()}
+\FunctionTok{ggdag\_status}\NormalTok{(DAG\_oxygen\_under\_ice\_v3,}
+             \AttributeTok{use\_labels =} \StringTok{"label"}\NormalTok{,}
+             \AttributeTok{text =} \ConstantTok{TRUE}\NormalTok{,}
+              \AttributeTok{text\_col =} \StringTok{"black"}\NormalTok{,}
+             \AttributeTok{label\_alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{theme\_dag}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -483,8 +437,8 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#identify the open paths that need to be adjusted for }
-\KeywordTok{paths}\NormalTok{(DAG_oxygen_under_ice_v2)}
+\CommentTok{\#identify the open paths that need to be adjusted for }
+\FunctionTok{paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v2)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -525,8 +479,8 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#plot the open  paths }
-\KeywordTok{ggdag_paths}\NormalTok{(DAG_oxygen_under_ice_v2)}
+\CommentTok{\#plot the open  paths }
+\FunctionTok{ggdag\_paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v2)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -534,7 +488,7 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggdag_paths}\NormalTok{(DAG_oxygen_under_ice_v2, }\DataTypeTok{shadow =} \OtherTok{TRUE}\NormalTok{) }\CommentTok{#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included}
+\FunctionTok{ggdag\_paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v2, }\AttributeTok{shadow =} \ConstantTok{TRUE}\NormalTok{) }\CommentTok{\#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included}
 \end{Highlighting}
 \end{Shaded}
 
@@ -542,8 +496,8 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#identify the open paths that need to be adjusted for }
-\KeywordTok{paths}\NormalTok{(DAG_oxygen_under_ice_v3)}
+\CommentTok{\#identify the open paths that need to be adjusted for }
+\FunctionTok{paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v3)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -579,8 +533,8 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#plot the open  paths }
-\KeywordTok{ggdag_paths}\NormalTok{(DAG_oxygen_under_ice_v3)}
+\CommentTok{\#plot the open  paths }
+\FunctionTok{ggdag\_paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v3)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -588,7 +542,7 @@ that need to be controlled for.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ggdag_paths}\NormalTok{(DAG_oxygen_under_ice_v3, }\DataTypeTok{shadow =} \OtherTok{TRUE}\NormalTok{) }\CommentTok{#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included}
+\FunctionTok{ggdag\_paths}\NormalTok{(DAG\_oxygen\_under\_ice\_v3, }\AttributeTok{shadow =} \ConstantTok{TRUE}\NormalTok{) }\CommentTok{\#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included}
 \end{Highlighting}
 \end{Shaded}
 
@@ -604,31 +558,29 @@ condition on summer GPP? {]} }
 
 {[}1{]} ``DOC\_at\_Freeze -\textgreater{} ER\_under\_ice -\textgreater{}
 Rate\_O2\_Drawdown -\textgreater{} anox\_duration'' {[}7{]}
-``DOC\_at\_Freeze \textless{}- Summer\_GPP -\textgreater{}
-GPP\_under\_ice -\textgreater{} Rate\_O2\_Drawdown -\textgreater{}
-anox\_duration'' {[}16{]} ``DOC\_at\_Freeze \textless{}- Summer\_GPP
--\textgreater{} O2\_at\_Freeze -\textgreater{} anox\_duration''
+``DOC\_at\_Freeze \textless- Summer\_GPP -\textgreater{} GPP\_under\_ice
+-\textgreater{} Rate\_O2\_Drawdown -\textgreater{} anox\_duration''
+{[}16{]} ``DOC\_at\_Freeze \textless- Summer\_GPP -\textgreater{}
+O2\_at\_Freeze -\textgreater{} anox\_duration''
 
-\hypertarget{identify-decendent-nodes}{%
-\section{Identify Decendent Nodes}\label{identify-decendent-nodes}}
+\section{Identify Decendent Nodes}\label{identify-decendent-nodes}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#you can identify "descendant nodes" }
-\KeywordTok{ggdag_descendants}\NormalTok{(DAG_oxygen_under_ice_v2, }\StringTok{"Summer_GPP"}\NormalTok{)}
+\CommentTok{\#you can identify "descendant nodes" }
+\FunctionTok{ggdag\_descendants}\NormalTok{(DAG\_oxygen\_under\_ice\_v2, }\StringTok{"Summer\_GPP"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{01_Create_DAG_files/figure-latex/unnamed-chunk-5-1.pdf}
 
-\hypertarget{identify-and-visualize-covariates-that-need-to-be-adjusted-for}{%
 \section{Identify and Visualize Covariates that need to be adjusted
-for}\label{identify-and-visualize-covariates-that-need-to-be-adjusted-for}}
+for}\label{identify-and-visualize-covariates-that-need-to-be-adjusted-for}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#identify the covariaters need to be adjusted for to meet the back-door criterion}
-\KeywordTok{adjustmentSets}\NormalTok{(DAG_oxygen_under_ice_v2)}
+\CommentTok{\#identify the covariaters need to be adjusted for to meet the back{-}door criterion}
+\FunctionTok{adjustmentSets}\NormalTok{(DAG\_oxygen\_under\_ice\_v2)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -643,7 +595,7 @@ for}\label{identify-and-visualize-covariates-that-need-to-be-adjusted-for}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{adjustmentSets}\NormalTok{(DAG_oxygen_under_ice_v3)}
+\FunctionTok{adjustmentSets}\NormalTok{(DAG\_oxygen\_under\_ice\_v3)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -653,8 +605,8 @@ for}\label{identify-and-visualize-covariates-that-need-to-be-adjusted-for}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Finally, you can also visulaize the variables that need to be adjusted for (which is also told to you by the adjustmentSets() function }
-\KeywordTok{ggdag_adjustment_set}\NormalTok{(DAG_oxygen_under_ice_v2, }\DataTypeTok{shadow =} \OtherTok{TRUE}\NormalTok{) }
+\CommentTok{\# Finally, you can also visulaize the variables that need to be adjusted for (which is also told to you by the adjustmentSets() function }
+\FunctionTok{ggdag\_adjustment\_set}\NormalTok{(DAG\_oxygen\_under\_ice\_v2, }\AttributeTok{shadow =} \ConstantTok{TRUE}\NormalTok{) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -662,7 +614,7 @@ for}\label{identify-and-visualize-covariates-that-need-to-be-adjusted-for}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included.}
+\CommentTok{\#Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included.}
 \end{Highlighting}
 \end{Shaded}
 
@@ -674,8 +626,8 @@ variables in my model. That also happens to be super handy because it is
 an easy variable to measure (we also have proxies in the form of summer
 chlorophyl). Really interesting fiddling with the question I am asking
 (``What if the causal question is''how does summer GPP impact anoxic
-duration?") and in that case it completely changes the adjustments you
-need and there is only one option! In that case we would need to
+duration?{}``) and in that case it completely changes the adjustments
+you need and there is only one option! In that case we would need to
 condition on summer terrestrial DOC inputs {]} }
 
 \#Check Conditional independeces We can also check to see which
@@ -684,8 +636,8 @@ impliedConditionalIndependencies().
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Identify the implied conditional dependencies}
-\KeywordTok{impliedConditionalIndependencies}\NormalTok{(DAG_oxygen_under_ice_v2)}
+\CommentTok{\# Identify the implied conditional dependencies}
+\FunctionTok{impliedConditionalIndependencies}\NormalTok{(DAG\_oxygen\_under\_ice\_v2)}
 \end{Highlighting}
 \end{Shaded}
 
