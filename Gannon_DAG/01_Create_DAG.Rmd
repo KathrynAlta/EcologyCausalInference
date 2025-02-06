@@ -29,9 +29,9 @@ library(tidyverse)
 
  **Variable name   **   | **Description    **                                                                         | 
 ----------------------- | ------------------------------------------------------------------------------------------- 
-| $\text{Native_psy}$    |  Native plant species richness in the plot, site and year |
-$\text{Exotic_psy}$          | Exotic species abundance in the plot, site and year |
-$\text{Exotics_yr0}$ | Exotic species abundance in year 0 per plot (pre-treatment) |
+| $\text{anox_duration}$    |  The amount of time (measured in days) that the water at the bottom of the lake has an oxygen concentration under 0.5 mg/L |
+$\text{O2_at_Freeze}$          | The total amount of oxygen present in the lake when the lake freezes in the fall |
+$\text{Ice_Duration}$ | Amount of time (measured in days) that ice is on the lake in the winter |
 $\text{Native_yr0}$ | Native plant species richness in year 0 per plot |
 $\text{NPKTreatment}$  |  Randomized experimental treatment: nutrient addition |
 $\text{Ndep_sy}$  | Nitrogen deposition for a site and year |
