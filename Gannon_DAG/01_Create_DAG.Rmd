@@ -4,8 +4,8 @@ title: Constructing a DAG for Anoxic Duration Under Ice and the Concentration of
 author: "Katie Gannon"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
