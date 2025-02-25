@@ -1,0 +1,51 @@
+---
+title: "zz_Old_Code"
+author: "Katie_Gannon"
+date: "2/25/2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{Simplified DAG}
+ DAG_oxygen_under_ice_simplified <- dagify(
+      
+      #Identify Relatiobships 
+      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
+      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
+      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
+      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
+      Summer_GPP~ Terrestrial_DOC_Inputs + Lake + Year,
+      Freezing_Degree_Days ~ Lake + Year, 
+      Terrestrial_DOC_Inputs ~ Lake + Year, 
+      O2_at_Freeze ~ Lake, 
+      Ice_Duration ~ Lake + Year, 
+      GPP_under_ice ~ Lake + Year, 
+      
+      # Specify exposure and outcome 
+      exposure = "DOC_at_Freeze", 
+      outcome = "anox_duration",
+      
+      # Label 
+      labels = c(outcome = "Annoxic Duration",
+                 exposure = "DOC at Lake Freeze "))
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

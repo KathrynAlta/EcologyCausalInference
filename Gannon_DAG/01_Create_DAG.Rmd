@@ -44,71 +44,37 @@ $\text{Freezing Degree Days }$  | Number of days when the air temperature was be
 $\text{Snow Accumulation}$  |  Snow depth on the lake |
 $\text{Ice Thickness}$  | Thickness of ice measured in cm|
 $\text{SWE}$  | Snow water equivalents |
-$\text{Wind}$  | average windspeed at on the lake since last snowfall event |
 $\text{ER Under Ice}$  | Rate of ecosystem respiration occuring under ice  |
 $\text{GPP Under Ice}$  | Rate of gross primary productivity under ice |
 $\text{Summer GPP}$  | Rate of gross primary productivity the previous summer |
 $\text{Terrestrial DOC Inputs}$  | Organic matter inputs to the lake from the watershed during summer |
 $\text{DOC at freezing}$  | Amount of organic matter present in the lake when the ice freezes measured as concentration of dissolved organic matter |
 
-
-# First Draft DAG 
-
-```{r}
-## Specify the DAG - Version 1
-DAG_oxygen_under_ice_v1 <- dagify(
-  anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-  O2_at_Freeze ~ Lake_Volume + Fall_Mixing_Duration,
-  Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation + Ice_Thickness, 
-  Snow_Accumulation ~ SWE + Wind,
-  Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
-  ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-  DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
-  GPP_under_ice ~ Summer_GPP + Light_Availability,
-  Light_Availability ~ Snow_Accumulation + Ice_Thickness
-)
-plot(DAG_oxygen_under_ice_v1)
-```
-# DAG Version 2
-```{r}
-set.seed(061295)
-## Specify the DAG - Version 2
-DAG_oxygen_under_ice_v2 <- dagify(
-  anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-  Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
-  ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-  DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
-  GPP_under_ice ~ Summer_GPP + Light_Availability,
-  Light_Availability ~ Snow_Accumulation + Ice_Thickness,
-  Ice_Thickness ~ Freezing_Degree_Days,
-  Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
-  O2_at_Freeze ~ Summer_GPP,
-  Summer_GPP~ Terrestrial_DOC_Inputs
-)
-plot(DAG_oxygen_under_ice_v2)
-```
-
-
-
 # Identifying Variables of Interest
 (set the seed when plotting because otherwise the DAG shows up in different orientations each time!) 
 
 ```{r}
 
-# Version 1 with Labels 
-    DAG_oxygen_under_ice_v1 <- dagify(
+# Create DAG  
+
+    DAG_oxygen_under_ice <- dagify(
       
       #Identify Relatiobships 
       anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-      O2_at_Freeze ~ Lake_Volume + Fall_Mixing_Duration,
-      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation + Ice_Thickness, 
-      Snow_Accumulation ~ SWE + Wind,
       Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
       ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
       DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
       GPP_under_ice ~ Summer_GPP + Light_Availability,
-      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
-    
+      Light_Availability ~ Snow_Accumulation + Ice_Thickness + Lake + Year,
+      Ice_Thickness ~ Freezing_Degree_Days,
+      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
+      O2_at_Freeze ~ Summer_GPP + Lake + Fall_Mixing,
+      Summer_GPP~ Terrestrial_DOC_Inputs + Lake + Year,
+      Freezing_Degree_Days ~ Lake + Year, 
+      Snow_Accumulation ~ Lake + Year,
+      Terrestrial_DOC_Inputs ~ Lake + Year, 
+      Fall_Mixing ~ Lake + Year, 
+      
       # Specify exposure and outcome 
       exposure = "DOC_at_Freeze", 
       outcome = "anox_duration",
@@ -118,79 +84,19 @@ plot(DAG_oxygen_under_ice_v2)
                  exposure = "DOC at Lake Freeze "))
 
 
-# Version 2 with labels 
-
-    DAG_oxygen_under_ice_v2 <- dagify(
-      
-      #Identify Relatiobships 
-      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
-      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
-      GPP_under_ice ~ Summer_GPP + Light_Availability,
-      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
-      Ice_Thickness ~ Freezing_Degree_Days,
-      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
-      O2_at_Freeze ~ Summer_GPP,
-      Summer_GPP~ Terrestrial_DOC_Inputs,
-    
-      # Specify exposure and outcome 
-      exposure = "DOC_at_Freeze", 
-      outcome = "anox_duration",
-      
-      # Label 
-      labels = c(outcome = "Annoxic Duration",
-                 exposure = "DOC at Lake Freeze "))
-    
-# Version 3 with labels (Same DAG but slightly different question)
-
-    DAG_oxygen_under_ice_v3 <- dagify(
-      
-      #Identify Relatiobships 
-      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
-      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
-      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
-      GPP_under_ice ~ Summer_GPP + Light_Availability,
-      Light_Availability ~ Snow_Accumulation + Ice_Thickness,
-      Ice_Thickness ~ Freezing_Degree_Days,
-      Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
-      O2_at_Freeze ~ Summer_GPP,
-      Summer_GPP~ Terrestrial_DOC_Inputs,
-    
-      # Specify exposure and outcome 
-      exposure = "Summer_GPP", 
-      outcome = "anox_duration",
-      
-      # Label 
-      labels = c(outcome = "Annoxic Duration",
-                 exposure = "Summer GPP"))
-
-# Visualize both versions 
+# Visualize DAG
 set.seed(124)
 
-ggdag_status(DAG_oxygen_under_ice_v1,
-             use_labels = "label",
-             text = TRUE,
-             text_col = "black",
-             label_alpha = 0.5) + theme_dag()
-
-
-ggdag_status(DAG_oxygen_under_ice_v2,
+ggdag_status(DAG_oxygen_under_ice,
              use_labels = "label",
              text = TRUE,
               text_col = "black",
              label_alpha = 0.5) + theme_dag()
 
-ggdag_status(DAG_oxygen_under_ice_v3,
-             use_labels = "label",
-             text = TRUE,
-              text_col = "black",
-             label_alpha = 0.5) + theme_dag()
 ```
 
 <span style="color:purple;">
-*Katie Comment:* Cool! I have a DAG! It is a bit of a mess at the momment because I think there are some extra variables that I don't need to worry about still hanging around in the DAG. As we move forward and refine things I might be able to make this prettier!  
+*Katie Comment:* Cleaning up code and trying to streamline to only the DAG that I need  
 </span>
 
 #Identify what must be controled for using adjustmentSets(). 
@@ -199,42 +105,32 @@ This function takes a DAG, with a given “exposure” or "treatment variable" a
 
 ```{r, echo = TRUE}
 #identify the open paths that need to be adjusted for 
-paths(DAG_oxygen_under_ice_v2)
+paths(DAG_oxygen_under_ice)
 
-#plot the open  paths 
-ggdag_paths(DAG_oxygen_under_ice_v2)
-ggdag_paths(DAG_oxygen_under_ice_v2, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
+#plot the open  paths (aka a mess of bubbles)
+ggdag_paths(DAG_oxygen_under_ice, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
 
-#identify the open paths that need to be adjusted for 
-paths(DAG_oxygen_under_ice_v3)
-
-#plot the open  paths 
-ggdag_paths(DAG_oxygen_under_ice_v3)
-ggdag_paths(DAG_oxygen_under_ice_v3, shadow = TRUE) #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included
 ```
 <span style="color:purple;">
-[*Katie Comment:* Here I have two open paths: Both of these paths are open and there are mediators along my causal path of interest from DOC at freeze to anoxic duration. For path [1] we do not want to condition on either ER under Ice or Rate of O2 draw down because they are mediating variables. Looking at paths [7] and [16] I have a slightly confusing structure where summer GPP impacts, DOC at freeze, O2 at freeze, and GPP under ice. In this case I am not sure if I need to condition on summer GPP? ]
+[*Katie Comment:* Alrighty, looks like we have 5 open paths. Super hard to tell from the graphs exactly what is in those paths. But from the print out we can get a better idea. Here are the open paths as far as I understand ]
 </span>
 
-[1] "DOC_at_Freeze -> ER_under_ice -> Rate_O2_Drawdown -> anox_duration"
-[7] "DOC_at_Freeze <- Summer_GPP -> GPP_under_ice -> Rate_O2_Drawdown -> anox_duration"
-[16] "DOC_at_Freeze <- Summer_GPP -> O2_at_Freeze -> anox_duration"
 
  
 # Identify Decendent Nodes 
 ```{r, echo = TRUE}
 #you can identify "descendant nodes" 
-ggdag_descendants(DAG_oxygen_under_ice_v2, "Summer_GPP")
+ggdag_descendants(DAG_oxygen_under_ice, "DOC_at_Freeze") 
+# this gives you all of the variables taht are direct decendents of (impacted by) "DOC at Freeze" 
 ```
 
 # Identify and Visualize Covariates that need to be adjusted for 
 ```{r, echo = TRUE}
 #identify the covariaters need to be adjusted for to meet the back-door criterion
-adjustmentSets(DAG_oxygen_under_ice_v2)
-adjustmentSets(DAG_oxygen_under_ice_v3)
+adjustmentSets(DAG_oxygen_under_ice)
 
 # Finally, you can also visulaize the variables that need to be adjusted for (which is also told to you by the adjustmentSets() function 
-ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE) 
+ggdag_adjustment_set(DAG_oxygen_under_ice, shadow = TRUE) 
 #Also, do not forget to set the argument shadow = TRUE, so that the arrows from the adjusted nodes are included.
 ```
 
@@ -246,7 +142,7 @@ ggdag_adjustment_set(DAG_oxygen_under_ice_v2, shadow = TRUE)
 We can also check to see which variables are conditionally independences in the DAG using impliedConditionalIndependencies().
 ```{r, echo = TRUE}
 # Identify the implied conditional dependencies
-impliedConditionalIndependencies(DAG_oxygen_under_ice_v2)
+impliedConditionalIndependencies(DAG_oxygen_under_ice)
 ```
 
 <span style="color:purple;">
