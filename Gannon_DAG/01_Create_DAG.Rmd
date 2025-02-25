@@ -83,6 +83,33 @@ $\text{DOC at freezing}$  | Amount of organic matter present in the lake when th
       labels = c(outcome = "Annoxic Duration",
                  exposure = "DOC at Lake Freeze "))
 
+# Put all on the same time scale 
+ DAG_oxygen_under_ice <- dagify(
+      
+      #Identify Relatiobships 
+      anox_duration ~ O2_at_Freeze + Avg_Ice_Duration + Avg_Rate_O2_Drawdown,
+      Avg_Rate_O2_Drawdown ~ Avg_ER_under_ice + Avg_GPP_under_ice, 
+      Avg_ER_under_ice ~ Total_Freezing_Degree_Days + DOC_at_Freeze,
+      DOC_at_Freeze ~ Avg_Summer_Terrestrial_DOC_Inputs + Avg_Summer_GPP, 
+      Avg_GPP_under_ice ~ Avg_Summer_GPP + Avg_Light_Availability,
+      Avg_Light_Availability ~ Avg_Snow_Accumulation + Avg_Ice_Thickness + Lake + Year,
+      Avg_Ice_Thickness ~ Total_Freezing_Degree_Days,
+      Ice_Duration ~ Total_Freezing_Degree_Days + Avg_Snow_Accumulation, 
+      O2_at_Freeze ~ Avg_Summer_GPP + Lake + Fall_Mixing,
+      Avg_Summer_GPP~ Avg_Summer_Terrestrial_DOC_Inputs + Lake + Year,
+      Total_Freezing_Degree_Days ~ Lake + Year, 
+      Avg_Snow_Accumulation ~ Lake + Year,
+      Terrestrial_DOC_Inputs ~ Lake + Year, 
+      Fall_Mixing ~ Lake + Year, 
+      
+      # Specify exposure and outcome 
+      exposure = "DOC_at_Freeze", 
+      outcome = "anox_duration",
+      
+      # Label 
+      labels = c(outcome = "Annoxic Duration",
+                 exposure = "DOC at Lake Freeze "))
+
 
 # Visualize DAG
 set.seed(124)
