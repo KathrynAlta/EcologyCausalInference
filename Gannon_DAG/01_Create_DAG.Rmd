@@ -1,6 +1,5 @@
 ---
-title: Constructing a DAG for Anoxic Duration Under Ice and the Concentration of Dissolved
-  Organic Matter in Fall
+title: Constructing a DAG for the impact of DOC on Anoxic Duration Under Ice 
 author: "Katie Gannon"
 date: "`r Sys.Date()`"
 output:
@@ -28,30 +27,8 @@ library(tidyverse)
 *Katie Comment:* I study lakes and for one of my projects I am interested in the processes happening under lake ice in winter. I will be using this exercise to explore how the amount of organic matter (measured as the concentration of dissolved organic carbon or DOC) in the water of a lake in the fall impacts the duration of anoxia (no oxygen) in bottom waters of mountain lakes. 
 </span> 
 
-<span style="color:purple;">
-Here are all of the variables that I initially included in my DAG After going through this exercise I realize that I can certainly simplify some of these! 
-</span>
 
- **Variable name   **   | **Description    **                                                                         | 
------------------------ | ------------------------------------------------------------------------------------------- 
-| $\text{anox_duration}$    |  The amount of time (measured in days) that the water at the bottom of the lake has an oxygen concentration under 0.5 mg/L |
-$\text{O2_at_Freeze}$          | The total amount of oxygen present in the lake when the lake freezes in the fall |
-$\text{Ice_Duration}$ | Amount of time (measured in days) that ice is on the lake in the winter |
-$\text{Rare of O2 Drawdown}$ | NThe rate of oxygen depletion under ice |
-$\text{Lake Volume}$  |  Volume of water in the lake  |
-$\text{Fall Mixing Duration}$  | Number of days that the lake was fully mixed in fall |
-$\text{Freezing Degree Days }$  | Number of days when the air temperature was bellow freezing  |
-$\text{Snow Accumulation}$  |  Snow depth on the lake |
-$\text{Ice Thickness}$  | Thickness of ice measured in cm|
-$\text{SWE}$  | Snow water equivalents |
-$\text{ER Under Ice}$  | Rate of ecosystem respiration occuring under ice  |
-$\text{GPP Under Ice}$  | Rate of gross primary productivity under ice |
-$\text{Summer GPP}$  | Rate of gross primary productivity the previous summer |
-$\text{Terrestrial DOC Inputs}$  | Organic matter inputs to the lake from the watershed during summer |
-$\text{DOC at freezing}$  | Amount of organic matter present in the lake when the ice freezes measured as concentration of dissolved organic matter |
-
-# Identifying Variables of Interest
-(set the seed when plotting because otherwise the DAG shows up in different orientations each time!) 
+# Create DAG
 
 ```{r}
 
@@ -83,36 +60,9 @@ $\text{DOC at freezing}$  | Amount of organic matter present in the lake when th
       labels = c(outcome = "Annoxic Duration",
                  exposure = "DOC at Lake Freeze "))
 
-# Put all on the same time scale 
- DAG_oxygen_under_ice <- dagify(
-      
-      #Identify Relatiobships 
-      anox_duration ~ O2_at_Freeze + Avg_Ice_Duration + Avg_Rate_O2_Drawdown,
-      Avg_Rate_O2_Drawdown ~ Avg_ER_under_ice + Avg_GPP_under_ice, 
-      Avg_ER_under_ice ~ Total_Freezing_Degree_Days + DOC_at_Freeze,
-      DOC_at_Freeze ~ Avg_Summer_Terrestrial_DOC_Inputs + Avg_Summer_GPP, 
-      Avg_GPP_under_ice ~ Avg_Summer_GPP + Avg_Light_Availability,
-      Avg_Light_Availability ~ Avg_Snow_Accumulation + Avg_Ice_Thickness + Lake + Year,
-      Avg_Ice_Thickness ~ Total_Freezing_Degree_Days,
-      Ice_Duration ~ Total_Freezing_Degree_Days + Avg_Snow_Accumulation, 
-      O2_at_Freeze ~ Avg_Summer_GPP + Lake + Fall_Mixing,
-      Avg_Summer_GPP~ Avg_Summer_Terrestrial_DOC_Inputs + Lake + Year,
-      Total_Freezing_Degree_Days ~ Lake + Year, 
-      Avg_Snow_Accumulation ~ Lake + Year,
-      Terrestrial_DOC_Inputs ~ Lake + Year, 
-      Fall_Mixing ~ Lake + Year, 
-      
-      # Specify exposure and outcome 
-      exposure = "DOC_at_Freeze", 
-      outcome = "anox_duration",
-      
-      # Label 
-      labels = c(outcome = "Annoxic Duration",
-                 exposure = "DOC at Lake Freeze "))
-
 
 # Visualize DAG
-set.seed(124)
+set.seed(124) #set the seed when plotting because otherwise the DAG shows up in different orientations each time!
 
 ggdag_status(DAG_oxygen_under_ice,
              use_labels = "label",
@@ -123,11 +73,10 @@ ggdag_status(DAG_oxygen_under_ice,
 ```
 
 <span style="color:purple;">
-*Katie Comment:* Cleaning up code and trying to streamline to only the DAG that I need  
+*Katie Comment:* The main updates that I have made are adding Lake and Year variables to my DAG (because I expect both of those variables to impact both my exposure and my impact variables) and thinking about the timescale of my variables. I realized that there was s disconnect because I was comparing some variables that were rates, some variables that had discrete measurements at individual timepoints, and some variables that were seasonal totals or averages. Those time steps made it tricky as I tried to think about how to account for more climate and seasonal variables. To deal with this disconnect, I shifted all of my variables to be either an descrete measure before the season of interest or an average/max across the season. 
 </span>
 
-#Identify what must be controled for using adjustmentSets(). 
-We can also have a summary of all possible paths in the DAG and identify which are open vs closed backdoors using paths(). 
+#Identify Paths 
 This function takes a DAG, with a given “exposure” or "treatment variable" and an “outcome” and identifies open backdoors: confounding variables (common causes) that need to be controlled for. 
 
 ```{r, echo = TRUE}
@@ -139,11 +88,9 @@ ggdag_paths(DAG_oxygen_under_ice, shadow = TRUE) #Also, do not forget to set the
 
 ```
 <span style="color:purple;">
-[*Katie Comment:* Alrighty, looks like we have 5 open paths. Super hard to tell from the graphs exactly what is in those paths. But from the print out we can get a better idea. Here are the open paths as far as I understand ]
+[*Katie Comment:* With these added parameters and timesteps I have a BUNCH of open paths. ]
 </span>
 
-
- 
 # Identify Decendent Nodes 
 ```{r, echo = TRUE}
 #you can identify "descendant nodes" 
@@ -162,7 +109,7 @@ ggdag_adjustment_set(DAG_oxygen_under_ice, shadow = TRUE)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Ahh! I see! This is so handy. It tells me what I need to condition on. Or at least it gives me options for pathways that I can condition on to close all of the backdoor. In this case I would choose to condition on Summer GPP to minimize the number of variables in my model. That also happens to be super handy because it is an easy variable to measure (we also have proxies in the form of summer chlorophyl). Really interesting fiddling with the question I am asking ("What if the causal question is "how does summer GPP impact anoxic duration?") and in that case it completely changes the adjustments you need and there is only one option! In that case we would need to condition on summer terrestrial DOC inputs ]
+[*Katie Comment:* In terms of looking at adjustment sets though it looks like I am in pretty good shape! Based on the data that I have I can pretty easily account for Lake, Year, and average summer GPP.  ]
 </span>
 
 #Check Conditional independeces
@@ -173,11 +120,9 @@ impliedConditionalIndependencies(DAG_oxygen_under_ice)
 ```
 
 <span style="color:purple;">
-[*Katie Comment:* Well that is a terrifyingly long list of conditional indipendicies. I think that I might need to more explicitly time step some of my variables. For example GPP and ER do impact eachother in each direction. So I need to specify GPP of the previous summer impacting ER under ice in winter etc.]
+[*Katie Comment:* I still need to dig through all of these conditional dependencies with a finetooth comb but on a cersory look I think that we are in pretty good shape.]
 </span>
 
-<span style="color:purple;">
-[*Questions:* Including lake and year as random effects?]</span>
 
 
 
