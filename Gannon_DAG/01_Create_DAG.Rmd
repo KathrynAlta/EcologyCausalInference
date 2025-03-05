@@ -53,7 +53,7 @@ library(tidyverse)
       Fall_Mixing ~ Lake + Year, 
       
       # Specify exposure and outcome 
-      exposure = "DOC_at_Freeze", 
+      exposure = "Snow_Accumulation", 
       outcome = "anox_duration",
       
       # Label 
