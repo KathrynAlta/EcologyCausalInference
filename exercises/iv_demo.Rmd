@@ -40,10 +40,10 @@ simulate_data <- function(){
   ## Create data variables within data.frame
   
   ## Make a column for observation ID
-  df <- data.frame(id = seq(1, 1000),
+  df <- data.frame(id = seq(1, 1000), # ID is just a sequence from 1 to 1000
                    
                    ## Columns for covariates
-                   slope = runif(1000, min = 50, max = 100),
+                   slope = runif(1000, min = 50, max = 100), # Here we are generating random numbers for slow between 50 and 100 
                    elevation = runif(1000, min = 150, max = 185),
                    dist_cities = runif(1000, min = 0, max = 250),
                    
