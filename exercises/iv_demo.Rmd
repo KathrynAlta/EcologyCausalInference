@@ -64,9 +64,9 @@ simulate_data <- function(){
              rnorm(100, 0, 1)) %>%
   
   ### Add column for the outcome variable
-    mutate(consumpt = 5*forest_protect + 
+    mutate(consumpt = 5*forest_protect + # This 5 is the important number! 
              0.07*slope + 0.05*elevation + 2*dist_cities + 
-             10*local_inst + error)
+             10*local_inst + error) # we know that consumption is driven strongly by both forest protection and local institutions (The thing we can't measure super well)
   return(df)  
 }
 ```
@@ -80,7 +80,7 @@ In each of the methods we use to estimate the effect of forest protection on soc
 ols_fun = function(){
   
   ## Simulate the dataset
-  data <- simulate_data()
+  data <- simulate_data() #This is the function that we made above simulating the data 
   
   ## Run OLS
   ols <- lm(consumpt ~ forest_protect + slope + elevation + 
@@ -93,7 +93,7 @@ ols_fun = function(){
 }
 
 ### Apply the function on 1000 replicates
-ols_sim <- replicate(100, ols_fun())
+ols_sim <- replicate(100, ols_fun()) #so we are simulating the data and running ols model and extracting the coefficients 100 times 
 
 ### Extract the model estimates
 ols_protect_est <- unlist(ols_sim[1, ])
@@ -121,12 +121,12 @@ Implement instrumental variables using the two stage least-squares regression. A
 iv_tsls_fun = function(){
   
   ## Simulate the dataset
-  data <- simulate_data()
+  data <- simulate_data() #This is the same functon for generating our data 
   
   ## Step 1
   ## Regress the percent of protected forest on the other explanatory variables 
   ## and our instrumental variable
-  tsls_step1 <- lm(forest_protect ~ slope + elevation + 
+  tsls_step1 <- lm(forest_protect ~ slope + elevation + # predict forest protection based on these other variables
                        dist_cities + dist_tributary, data = data)
   
   ## Extract fitted values of the percent of protected forest
@@ -135,7 +135,7 @@ iv_tsls_fun = function(){
   ## Step 2
   ## Regress our outcome of interest on the predicted value of the treatment + 
   ## the other explanatory variables
-  tsls_step2 <- lm(consumpt ~ pred_value + slope + elevation + dist_cities, 
+  tsls_step2 <- lm(consumpt ~ pred_value + slope + elevation + dist_cities, # now here instead of using just forest protection we are using our predicted value of forest protection 
                    data = data)
   
   ## Extract model coefficients and standard error
@@ -145,7 +145,7 @@ iv_tsls_fun = function(){
 }
 
 ### Apply the function on 100 replicates
-iv_tsls_sim <- replicate(100, iv_tsls_fun())
+iv_tsls_sim <- replicate(100, iv_tsls_fun()) #here again we are generating our data, analyzing it, and saving the coeffidients 100 times 
 
 ### Extract the model estimates
 iv_tsls_est <- unlist(iv_tsls_sim[1, ])
@@ -173,11 +173,11 @@ both_methods <- cbind.data.frame(ols_protect_est,
 
 ### Reshape the data
 both_methods <- both_methods %>%
-  gather(method, estimate, ols_protect_est:iv_tsls_est) %>%
-  mutate(method_clean = ifelse(method == "ols_protect_est", "OLS", "IV"))
+  gather(method, estimate, ols_protect_est:iv_tsls_est) %>% #this is shifting the df from wide to long format (column for method and then all estimates togehter, handy and clean )
+  mutate(method_clean = ifelse(method == "ols_protect_est", "OLS", "IV")) #This is just making a new column that is called method_clean that has either "OLS" or "IV" instead of the long method name
 
 ### Visualize distribution of estimates
-ggplot(both_methods, aes(x = method_clean, y = estimate)) + 
+ggplot(both_methods, aes(x = method_clean, y = estimate)) + #now just make a box plot to compare the coefficient outputs of each method 
   geom_boxplot() +
   theme_classic() +
   labs(y = "Estimated effect of forest protection",
@@ -188,6 +188,8 @@ ggplot(both_methods, aes(x = method_clean, y = estimate)) +
              linetype = "dashed",
              color = "red")
 
+#Comes back to the idea that the sign/direction for both methods was the same but OLS seems to overestimate the impact 
+
 # ggsave("method_comparison.png")
 ```
 
@@ -197,6 +199,9 @@ The AER package has a built-in function, IVreg that lets you implement IV in a s
 
 For more details on the AER package, see https://www.econometrics-with-r.org/12-ivr.html 
 
+Gramar for ivreg: 
+Regressors and instruments for ivreg are most easily specified in a formula with two parts on the right-hand side, e.g., y ~ x1 + x2 | z1 + z2 + z3, where x1 and x2 are the regressors and z1, z2, and z3 are the instruments.
+
 ```{r}
 ### Write a function to generate data and analyze using IV
 iv_fun <- function(){
@@ -205,8 +210,9 @@ iv_fun <- function(){
   data <- simulate_data()
   
   ## Run with IV 
-  IVreg <- ivreg(consumpt ~ forest_protect + slope + 
-                   elevation + dist_cities | dist_tributary + 
+  IVreg <- ivreg(consumpt ~ forest_protect + slope + #still doing the same thing with two stage least squares! 
+                   elevation + dist_cities | dist_tributary + #Create an IV by regressing all the variables after the                                                                   verticle line 
+      # KAG question: how are we using slope, elev, and dist cities as instruments and in our main model? blow up the assumption that instruments have no other connection to Y?  
                    slope + elevation + dist_cities, data = data)
   
   ## Extract model coefficients and standard error
@@ -223,7 +229,7 @@ iv_protect_est <- unlist(iv_sim[1, ])
 
 ### Print mean, standard deviation, minimum, and maximum values for coefficient estimates
 c(mean(iv_protect_est), sd(iv_protect_est), 
-  min(iv_protect_est), max(iv_protect_est))
+  min(iv_protect_est), max(iv_protect_est)) #Here we see that IV using ivreg func also worked and created the same correct result as when we coded out the two stage least squares, which is just a good sanity check because they are doing the same thing 
 
 ### Extract the standard deviations
 iv_protect_sd <- unlist(iv_sim[2, ])
@@ -237,23 +243,25 @@ c(mean(iv_protect_sd), sd(iv_protect_sd),
 
 ### Check relevance of instrument
 #### smaller
+remember we are not quite done, we still need to check and see how good our instrument actually is. We can test the first assumption, the connection btwn the instrument and the X, but remember we can not test the second assumption about no other connections btwn the intstrument and the outcome. This one we can test with an F test, but the other one we just have to argue about 
 ```{r}
 ### Simulate a dataset
-data_for_iv <- simulate_data()
+data_for_iv <- simulate_data() # here we are just simulating our same data
 
 ### Write the first stage of two stage procedure
 first_stage <- lm(forest_protect ~ slope + elevation + 
                     dist_cities + dist_tributary,
-                  data = data_for_iv)
+                  data = data_for_iv) #use the instruments to predict forest protection 
 
 ### F test to see if the instrument explains enough of the explanatory variable
 instr_ftest <- waldtest(first_stage, .~.-dist_tributary)
-print(instr_ftest)
-
+print(instr_ftest) #test if the instrument explains enough of the explanatory variable 
+# looks good! Remember Laura said standard right now is to have a F statistic greater than 40 and here we are over 1000 (it used to be acceptable to have F statistic above 10 ...)
+# plus we have a low p value --> we can make the assumption that our instrument is relevant 
 
 ### visualize
 data_for_iv %>%
-  ggplot(aes(x = local_inst, y = consumpt)) + geom_point()
+  ggplot(aes(x = local_inst, y = consumpt)) + geom_point() # we can also visually check and yes it looks like there is a relationship btwn our outcome variable (consumption) and the local institutions (remember the thing we can't really control for well but we think it matters, the whole reason we used an instrument in the first place! )
 ```
 The F_test value is high and the p-value is low --> reject the null hypothesis that the instrument is irrelevant.
 
