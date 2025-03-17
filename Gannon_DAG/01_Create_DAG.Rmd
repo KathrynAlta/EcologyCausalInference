@@ -37,28 +37,28 @@ library(tidyverse)
     DAG_oxygen_under_ice <- dagify(
       
       #Identify Relatiobships 
-      anox_duration ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
+      DO_under_ice ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
       Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
       ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-      DOC_at_Freeze ~ Terrestrial_DOC_Inputs + Summer_GPP, 
+      DOC_at_Freeze ~ Summer_DOC + Summer_GPP, 
       GPP_under_ice ~ Summer_GPP + Light_Availability,
       Light_Availability ~ Snow_Accumulation + Ice_Thickness + Lake + Year,
       Ice_Thickness ~ Freezing_Degree_Days,
       Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
       O2_at_Freeze ~ Summer_GPP + Lake + Fall_Mixing,
-      Summer_GPP~ Terrestrial_DOC_Inputs + Lake + Year,
+      Summer_GPP~ Summer_DOC + Lake + Year,
       Freezing_Degree_Days ~ Lake + Year, 
       Snow_Accumulation ~ Lake + Year,
-      Terrestrial_DOC_Inputs ~ Lake + Year, 
+      Summer_DOC ~ Lake + Year, 
       Fall_Mixing ~ Lake + Year, 
       
       # Specify exposure and outcome 
-      exposure = "Snow_Accumulation", 
-      outcome = "anox_duration",
+      exposure = "Summer_DOC", 
+      outcome = "DO_under_ice",
       
       # Label 
-      labels = c(outcome = "Annoxic Duration",
-                 exposure = "DOC at Lake Freeze "))
+      labels = c(outcome = "DOC Under Ice",
+                 exposure = "Summer DOC Concentration "))
 
 
 # Visualize DAG
