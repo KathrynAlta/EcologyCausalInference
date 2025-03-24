@@ -39,36 +39,59 @@ library(tidyverse)
       #Identify Relatiobships 
       DO_under_ice ~ O2_at_Freeze + Ice_Duration + Rate_O2_Drawdown,
       Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice, 
-      ER_under_ice ~ Freezing_Degree_Days + DOC_at_Freeze,
-      DOC_at_Freeze ~ Summer_DOC + Summer_GPP, 
-      GPP_under_ice ~ Summer_GPP + Light_Availability,
+      ER_under_ice ~ Freezing_Degree_Days + Fall_DOC,
+      Fall_DOC ~ Summer_DOC + Summer_CHLA, 
+      GPP_under_ice ~ Summer_CHLA + Light_Availability,
       Light_Availability ~ Snow_Accumulation + Ice_Thickness + Lake + Year,
       Ice_Thickness ~ Freezing_Degree_Days,
       Ice_Duration ~ Freezing_Degree_Days + Snow_Accumulation, 
-      O2_at_Freeze ~ Summer_GPP + Lake + Fall_Mixing,
-      Summer_GPP~ Summer_DOC + Lake + Year,
+      O2_at_Freeze ~ Summer_CHLA + Lake + Fall_Mix_Duration,
+      Summer_CHLA ~ Lake + Year,
       Freezing_Degree_Days ~ Lake + Year, 
       Snow_Accumulation ~ Lake + Year,
-      Summer_DOC ~ Lake + Year, 
-      Fall_Mixing ~ Lake + Year, 
+      Summer_DOC ~ Lake + Year + Summer_CHLA, 
+      Fall_Mix_Duration ~ Lake + Year, 
       
       # Specify exposure and outcome 
-      exposure = "Summer_DOC", 
+      exposure = "Snow_Accumulation", 
       outcome = "DO_under_ice",
       
       # Label 
-      labels = c(outcome = "DOC Under Ice",
-                 exposure = "Summer DOC Concentration "))
+      labels = c(outcome = "DO_under_ice",
+                 exposure = "Snow_Accumulation"))
+
+ DAG_DO_Ice <- dagify(
+      
+      #Identify Relatiobships 
+      DO_under_ice ~ O2_at_Freeze + Days_Since_Freeze + Rate_O2_Drawdown,
+      O2_at_Freeze ~ Lake + Year,
+      Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice + Lake + Year,
+        GPP_under_ice ~ Light_Availability,
+        Light_Availability ~ Snow_Accumulation + Freezing_Degree_Days + Lake + Year,
+        Snow_Accumulation ~ Lake + Year + Freezing_Degree_Days,
+      
+      # Specify exposure and outcome 
+      exposure = "Snow_Accumulation", 
+      outcome = "DO_under_ice",
+      
+      # Label 
+      labels = c(outcome = "DO_under_ice",
+                 exposure = "Snow_Accumulation"))
 
 
 # Visualize DAG
 set.seed(124) #set the seed when plotting because otherwise the DAG shows up in different orientations each time!
 
-ggdag_status(DAG_oxygen_under_ice,
+ggdag_status( DAG_DO_Ice,
              use_labels = "label",
              text = TRUE,
               text_col = "black",
              label_alpha = 0.5) + theme_dag()
+
+#identify the covariaters need to be adjusted for to meet the back-door criterion
+adjustmentSets(DAG_oxygen_under_ice)
+
+adjustmentSets(DAG_DO_Ice)
 
 ```
 
