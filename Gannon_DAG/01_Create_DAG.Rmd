@@ -99,11 +99,13 @@ library(tidyverse)
   DAG_DO_Ice_updated <- dagify(
       
       #Identify Relatiobships 
-      Change_in_DO ~ Start_DO + Rate_Photosynth + Rate_Respiration,
-      Rate_Photosynth ~ Light_Availability + Phyto_Community + Lake + Year, 
-      Light_Availability ~ Recent_Snow + Wind + DOY + Lake + Clouds, 
-        Wind ~ Lake + Year,
-        Recent_Snow ~ DOY + Year,
+      Change_in_DO ~ Starting_DO + Days_Since_Freeze + Rate_O2_Drawdown,
+      Starting_DO ~ Lake + Year + Days_Since_Freeze,
+      Rate_O2_Drawdown ~ Respiration + Photosynthesis + Lake + Year,
+        Photosynthesis ~ Light_Availability,
+        Light_Availability ~ Recent_Snow + Wind + DOY + Clouds + Lake + Year,
+        Wind ~ Lake,
+        Recent_Snow ~ Lake + Year,
       
       # Specify exposure and outcome 
       exposure = "Recent_Snow", 
@@ -117,7 +119,7 @@ library(tidyverse)
 # Visualize DAG
 set.seed(124) #set the seed when plotting because otherwise the DAG shows up in different orientations each time!
 
-dag_plot <- ggdag_status( DAG_DO_Ice_change,
+dag_plot <- ggdag_status( DAG_DO_Ice_updated,
              use_labels = "label",
              text = TRUE,
               text_col = "black",
