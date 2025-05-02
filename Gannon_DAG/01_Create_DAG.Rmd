@@ -67,8 +67,8 @@ library(tidyverse)
       O2_at_Freeze ~ Lake + Year,
       Rate_O2_Drawdown ~ ER_under_ice + GPP_under_ice + Lake + Year,
         GPP_under_ice ~ Light_Availability,
-        Light_Availability ~ Snow_Accumulation + Freezing_Degree_Days + Lake + Year,
-        Snow_Accumulation ~ Lake + Year + Freezing_Degree_Days,
+        Light_Availability ~ Snow_Accumulation + Lake + Year,
+        Snow_Accumulation ~ Lake + Year,
       
       # Specify exposure and outcome 
       exposure = "Snow_Accumulation", 
@@ -77,12 +77,47 @@ library(tidyverse)
       # Label 
       labels = c(outcome = "DO_under_ice",
                  exposure = "Snow_Accumulation"))
+ 
+ DAG_DO_Ice_change <- dagify(
+      
+      #Identify Relatiobships 
+      Change_in_DO ~ Starting_DO + Days_Since_Freeze + Rate_O2_Drawdown,
+      Starting_DO ~ Lake + Year + Days_Since_Freeze,
+      Rate_O2_Drawdown ~ Respiration + Photosynthesis + Lake + Year,
+        Photosynthesis ~ Light_Availability,
+        Light_Availability ~ Recent_Snow + Lake + Year,
+        Recent_Snow ~ Lake + Year,
+      
+      # Specify exposure and outcome 
+      exposure = "Recent_Snow", 
+      outcome = "Change_in_DO",
+      
+      # Label 
+      labels = c(outcome = "Change_in_DO",
+                 exposure = "Recent_Snow"))
+ 
+  DAG_DO_Ice_updated <- dagify(
+      
+      #Identify Relatiobships 
+      Change_in_DO ~ Start_DO + Rate_Photosynth + Rate_Respiration,
+      Rate_Photosynth ~ Light_Availability + Phyto_Community + Lake + Year, 
+      Light_Availability ~ Recent_Snow + Wind + DOY + Lake + Clouds, 
+        Wind ~ Lake + Year,
+        Recent_Snow ~ DOY + Year,
+      
+      # Specify exposure and outcome 
+      exposure = "Recent_Snow", 
+      outcome = "Change_in_DO",
+      
+      # Label 
+      labels = c(outcome = "Change_in_DO",
+                 exposure = "Recent_Snow"))
 
 
 # Visualize DAG
 set.seed(124) #set the seed when plotting because otherwise the DAG shows up in different orientations each time!
 
-ggdag_status( DAG_DO_Ice,
+dag_plot <- ggdag_status( DAG_DO_Ice_change,
              use_labels = "label",
              text = TRUE,
               text_col = "black",
@@ -92,6 +127,12 @@ ggdag_status( DAG_DO_Ice,
 adjustmentSets(DAG_oxygen_under_ice)
 
 adjustmentSets(DAG_DO_Ice)
+
+adjustmentSets(DAG_DO_Ice_updated)
+
+adjustmentSets(DAG_DO_Ice_change)
+
+dag_plot
 
 ```
 
